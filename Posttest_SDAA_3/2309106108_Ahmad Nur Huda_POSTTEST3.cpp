@@ -239,6 +239,11 @@ void hapusMainan(Node *&HEAD) {
                 temp->next = temp->next->next;
                 delete nodeHapus;
                 break;
+            } else if (temp->mainan.nama == indeks_mainan) {
+                Node *nodeHapus = temp;
+                HEAD = HEAD->next;
+                delete nodeHapus;
+                break;
             }
             temp = temp->next;
         }
@@ -250,14 +255,14 @@ void hapusMainan(Node *&HEAD) {
         if (HEAD->next == nullptr) {
             delete HEAD;
             HEAD = nullptr;
-            return;
+        } else {
+            Node *temp = HEAD;
+            while (temp->next->next != nullptr) {
+                temp = temp->next;
+            }
+            delete temp->next;
+            temp->next = nullptr;
         }
-        Node *temp = HEAD;
-        while (temp->next->next != nullptr) {
-            temp = temp->next;
-        }
-        delete temp->next;
-        temp->next = nullptr;
     }
     
     system("cls");
