@@ -646,4 +646,277 @@ void displayFilter(Node *HEAD) {
             }
         } else if (ket_mainan == "2") {
             for (int i = 0; i < panjangkondisi; i++) {
-                co
+                cout << i+1 << ". " << arraykondisi[i] <<endl;
+            }
+            cout << "Tampilkan Mainan Berdasarkan Kondisi Yang Mana (Pilih 1-5): ";
+            cin >> indeks_mainan_angka;
+            kondisiTerpilih = arraykondisi[indeks_mainan_angka-1];
+            
+            while (HEAD) {
+                if (HEAD->mainan.kondisi == kondisiTerpilih) {
+                    cout << "Mainan(ID: " << HEAD->mainan.id << ")\n" << "Nama: " << HEAD->mainan.nama << "\n" << "Kategori Mainan: " << HEAD->mainan.jenis << "\n" << "Tahun Produksi: " << HEAD->mainan.tahun_produksi << "\n" << "Kondisi: " << HEAD->mainan.kondisi << "\n" <<endl;
+                    HEAD = HEAD->next;
+                } else {
+                    HEAD = HEAD->next;
+                }
+            }
+        } else {
+            cout << "Tidak Valid" << endl;
+        }
+    } while (ket_mainan != "1" and ket_mainan != "2");
+}
+
+void badCharHeuristic(string str, int size, int badChar[NO_OF_CHARS])
+{
+    
+    for (int i = 0; i < NO_OF_CHARS; i++)
+    {
+        badChar[i] = -1;
+    }
+
+    
+    for (int i = 0; i < size; i++)
+    {
+        badChar[(int)str[i]] = i;
+    }
+}
+
+void search(Node *head, string key)
+{
+    int keyLength = key.size();
+
+    Node *temp = head;
+
+    while (temp != nullptr)
+    {
+        int dataLength = temp->mainan.nama.size();
+
+        int badChar[NO_OF_CHARS];
+        badCharHeuristic(key, keyLength, badChar);
+
+        int s = 0;                            
+        while (s <= (dataLength - keyLength)) 
+        {
+            int j = keyLength - 1;
+
+            while (j >= 0 && key[j] == temp->mainan.nama[s + j])
+            {
+                j--;
+            }
+
+            if (j < 0)
+            {
+                cout << "Mainan(ID: " << temp->mainan.id << ")\n" << "Nama: " << temp->mainan.nama << "\n" << "Kategori Mainan: " << temp->mainan.jenis << "\n" << "Tahun Produksi: " << temp->mainan.tahun_produksi << "\n" << "Kondisi: " << temp->mainan.kondisi << "\n" <<endl;
+                break;
+            }
+            else
+            {
+                s += Maks(1, j - badChar[temp->mainan.nama[s + j]]);
+            }
+        }
+        temp = temp->next;
+    }
+}
+
+Node* fibonacciSearch(Node* head, int id) {
+    Node* temp = head;
+    int fibM2 = 0;  // (m-2)'th Fibonacci No.
+    int fibM1 = 1;  // (m-1)'th Fibonacci No.
+    int fibM = fibM2 + fibM1; // m'th Fibonacci No.
+
+    // Hitung Fibonacci number yang lebih besar atau sama dengan jumlah elemen
+    while (fibM < daya_tampung) {
+        fibM2 = fibM1;
+        fibM1 = fibM;
+        fibM = fibM1 + fibM2;
+    }
+
+    // Offset untuk elemen yang ditemukan
+    int offset = -1;
+
+    // Loop sampai kita menemukan elemen
+    while (fibM > 1) {
+        // Indeks untuk elemen yang akan diperiksa
+        int i = min(offset + fibM2, daya_tampung - 1);
+
+        // Traverse ke indeks i
+        Node* current = head;
+        for (int j = 0; j < i && current != nullptr; j++) {
+            current = current->next;
+        }
+
+        if (current != nullptr) {
+            if (current->mainan.id > id) {
+                fibM = fibM2;
+                fibM1 = fibM1 - fibM2;
+                fibM2 = fibM1 - fibM2;
+            } else if (current->mainan.id < id) {
+                fibM = fibM1;
+                fibM1 = fibM2;
+                fibM2 = fibM - fibM1;
+                offset = i;
+            } else {
+                return current; // Ditemukan
+            }
+        } else {
+            break; // Jika tidak ada elemen, keluar dari loop
+        }
+    }
+
+    // Cek elemen terakhir
+    if (fibM1 && temp != nullptr && temp->mainan.id == id) {
+        return temp; // Ditemukan
+    }
+
+    return nullptr; // Tidak ditemukan
+}
+
+// Fungsi untuk mencari mainan berdasarkan ID menggunakan Jump Search
+void jumpSearch(Node* head, int id) {
+    Node* current = head;
+    int jump = sqrt(daya_tampung); // Ukuran lompatan
+    Node* prev = nullptr;
+
+    while (current != nullptr) {
+        // Melompat ke node berikutnya
+        for (int i = 0; i < jump && current != nullptr; i++) {
+            prev = current;
+            current = current->next;
+        }
+
+        // Jika ID yang dicari lebih kecil dari ID di node saat ini, lakukan pencarian linier
+        if (current == nullptr || current->mainan.id > id) {
+            current = prev; // Kembali ke node sebelumnya
+            while (current != nullptr && current->mainan.id < id) {
+                current = current->next;
+            }
+            // Cek apakah ID ditemukan
+            if (current != nullptr && current->mainan.id == id) {
+                cout << "Mainan(ID: " << current->mainan.id << ")\n" 
+                     << "Nama: " << current->mainan.nama << "\n" 
+                     << "Kategori Mainan: " << current->mainan.jenis << "\n" 
+                     << "Tahun Produksi: " << current->mainan.tahun_produksi << "\n" 
+                     << "Kondisi: " << current->mainan.kondisi << "\n" << endl;
+                return;
+            }
+            break; // Jika tidak ditemukan, keluar dari loop
+        }
+    }
+    cout << "Mainan dengan ID " << id << " tidak ditemukan." << endl;
+}
+
+/*
+Blok Kode Program Utama Crud
+*/
+int main() {
+    Node *HEAD = nullptr; //Untuk HEAD Link list, TOP Stack dan Front Queue
+    //Node* TOP = nullptr;
+    Node *REAR = nullptr;
+    string stu;
+    //tambahMainanDariFile(HEAD, filename);
+    do {
+        system("cls");
+        cout << "Sistem Manajemen Koleksi Mainan\n" <<endl;
+        cout << "1. Tambah Mainan Baru\n2. Update Mainan\n3. Hapus Mainan\n4. Tampilkan Koleksi Mainan\n----------------------------------\n            Stack\n\n5. Tambah Mainan Baru (Push)\n6. Hapus Mainan (Pop)\n7. Tampilkan Mainan (Peek)\n----------------------------------\n            Queue\n\n8. Tambah Mainan (Enqueue)\n9. Hapus Mainan (Dequeue)\n10. Tampilkan Mainan (Queue)\n----------------------------------\n            Searching\n\n11. Filter Mainan\n12. Search Mainan Berdasarkan Nama (Booyer-Moore)\n13. Search Mainan Berdasarkan ID (Fibonacci)\n14. Search Mainan Berdasarkan ID (Jump)\n----------------------------------\n   Sorting Ascending (Quick Sort)\n\n15. Berdasarkan ID\n16. Berdasarkan Tahun Produksi\n----------------------------------\n   Sorting Descending (Merge Sort)\n\n17. Berdasarkan ID\n18. Berdasarkan Tahun Produksi\n----------------------------------\n19. Keluar\nPilih(1-19): ";
+        getline(cin, pilihan);
+        if (pilihan=="1") {
+            system("cls");
+            tambahMainan(HEAD);
+        } else if (pilihan=="2") {
+            system("cls");
+            updateMainan(HEAD);
+        } else if (pilihan=="3") {
+            system("cls");
+            hapusMainan(HEAD);
+        } else if (pilihan=="4") {
+            system("cls");
+            tampilkanKoleksiMainan(HEAD);
+            if (daya_tampung != 0) {
+                kembali_loop();
+            }
+        } else if (pilihan=="5") {
+            system("cls");
+            push(HEAD);
+        } else if (pilihan == "6") {
+            system("cls");
+            pop(HEAD);
+        } else if (pilihan =="7") {
+            system("cls");
+            displayStack(HEAD);
+            kembali_loop();
+        } else if (pilihan == "8") {
+            system("cls");
+            enqueue(&REAR, HEAD);
+        } else if (pilihan == "9") {
+            system("cls");
+            dequeue(HEAD);
+        } else if (pilihan == "10") {
+            system("cls");
+            displayQueue(HEAD);
+            kembali_loop();
+        } else if (pilihan == "11") {
+            system("cls");
+            displayFilter(HEAD);
+            kembali_loop();
+        } else if (pilihan == "12") {
+            system("cls");
+            cout << "Masukkan Kata Kunci Mainan: ";
+            getline(cin, ket_mainan); 
+            search(HEAD, ket_mainan);
+            kembali_loop();
+        } else if (pilihan == "13") {
+            system("cls");
+            cout << "Masukkan ID Mainan yang ingin dicari: ";
+            int id;
+            cin >> id;
+            cin.ignore();
+            Node* result = fibonacciSearch(HEAD, id);
+            if (result != nullptr) {
+            cout << "Mainan(ID: " << result->mainan.id << "    )\n" 
+                << "Nama: " << result->mainan.nama << "\n" 
+                << "Kategori Mainan: " << result->mainan.jenis << "\n" 
+                << "Tahun Produksi: " << result->mainan.tahun_produksi << "\n" 
+                << "Kondisi: " << result->mainan.kondisi << "\n" << endl;
+            } else {
+                cout << "Mainan dengan ID " << id << " tidak ditemukan." << endl;
+            }
+            kembali_loop();
+        } else if (pilihan == "14") {
+            system("cls");
+            int id;
+            cout << "Masukkan ID Mainan: ";
+            cin >> id;
+            cin.ignore();
+            jumpSearch(HEAD, id);
+            kembali_loop();
+        } else if (pilihan == "15") {
+            system("cls");
+            quickSortIDAsc(HEAD, REAR);
+            cout << "Data berhasil diurutkan berdasarkan ID (Ascending)!" << endl;
+            tampilkanKoleksiMainan(HEAD);
+            kembali_loop();
+        } else if (pilihan == "16") {
+            system("cls");
+            quickSortYearAsc(HEAD, REAR);
+            cout << "Data berhasil diurutkan berdasarkan Tahun Produksi (Ascending)!" << endl;
+            tampilkanKoleksiMainan(HEAD);
+            kembali_loop();
+        } else if (pilihan == "17") {
+            system("cls");
+            mergeSortIDDesc(&HEAD);
+            cout << "Data berhasil diurutkan berdasarkan ID (Descending)!" << endl;
+            tampilkanKoleksiMainan(HEAD);
+            kembali_loop();
+        } else if (pilihan == "18") {
+            system("cls");
+            mergeSortYearDesc(&HEAD);
+            cout << "Data berhasil diurutkan berdasarkan Tahun Produksi (Descending)!" << endl;
+            tampilkanKoleksiMainan(HEAD);
+            kembali_loop();
+        } else if (pilihan == "19") {
+            return 0;
+        } else {
+            cout << "Pilihan Tidak Valid!" <<endl;
+        }
+    } while (pilihan != "18");
+} //18.42
