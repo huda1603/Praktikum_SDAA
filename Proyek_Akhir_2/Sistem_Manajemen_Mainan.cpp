@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 using namespace std; //POSTTEST 4
 /////PR UBAH DATA MENJADI DATA SORTING
 //Untuk Batas Maksimal Jumlah Mainan Yang Disimpan
