@@ -12,7 +12,6 @@ using namespace std; //POSTTEST 4
 /*
 Blok Kode Untuk Menampung Variabel Global
 */
-string filename = "mainan.txt"; // Untuk Mengimport File txt yang berisi List Mainan
 string loop; //Untuk Kembali Menginput Informasi Mainan Atau Menu
 int idDihapus; //Untuk Menyimpan Id Mainan Apabila Mainan Dihapus
 bool idTerhapus = false; //Untuk Mengambil Informasi Apakah Ada Riwayat Id mainan terhapus
